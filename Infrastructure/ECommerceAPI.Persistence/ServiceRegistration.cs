@@ -1,6 +1,8 @@
 ﻿using ECommerceAPI.Persistence.Contexts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using ECommerceAPI.Application.Repositories;
+using ECommerceAPI.Persistence.Repositories;
 
 namespace ECommerceAPI.Persistence
 {
@@ -8,9 +10,10 @@ namespace ECommerceAPI.Persistence
     {
         public static void AddPersistenceServices(this IServiceCollection services)
         {
-            //services.AddSingleton<IProductService, ProductService>();
+            services.AddDbContext<ECommerceDbContext>(options => options.UseSqlServer(Configuration.ConnectionString));
 
-            services.AddDbContext<ECommerceDbContext>(options => options.UseSqlServer());
+            services.AddScoped<IProductReadRepository, ProductReadRepository>();
+            services.AddScoped<IProductWriteRepository, ProductWriteRepository>();
         }
     }
 }

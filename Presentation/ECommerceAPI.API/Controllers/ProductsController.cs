@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ECommerceAPI.Application.Repositories;
+using ECommerceAPI.Domain.Entities;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace ECommerceAPI.API.Controllers
 {
@@ -6,17 +9,61 @@ namespace ECommerceAPI.API.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        //private readonly IProductService _productService;
-        //public ProductsController(IProductService productService)
-        //{
-        //    _productService = productService;
-        //}
+        private readonly IProductReadRepository _productReadRepository;
+        private readonly IProductWriteRepository _productWriteRepository;
+        public ProductsController(IProductReadRepository productReadRepository, IProductWriteRepository productWriteRepository)
+        {
+            _productReadRepository = productReadRepository;
+            _productWriteRepository = productWriteRepository;
+        }
 
-        //[HttpGet]
-        //public IActionResult GetProducts()
-        //{
-        //    var products = _productService.GetProducts();
-        //    return Ok(products);
-        //}
+        [HttpGet]
+        public IActionResult Get()
+        {
+            var products = _productReadRepository.GetAll(false);
+            return Ok(products);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(string id)
+        {
+            var product = await _productReadRepository.GetByIdAsync(id, false);
+            return Ok(product);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Post(Product data)
+        {
+            await _productWriteRepository.AddAsync(new()
+            {
+                Name = data.Name,
+                Price = data.Price,
+                Stock = data.Stock,
+            });
+            await _productWriteRepository.SaveAsync();
+            return StatusCode((int)HttpStatusCode.Created);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Put(Product data)
+        {
+            Product product = await _productReadRepository.GetByIdAsync(data.Id.ToString());
+
+            product.Name = data.Name;
+            product.Price = data.Price;
+            product.Stock = data.Stock;
+
+            await _productWriteRepository.SaveAsync();
+            return Ok();
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(string id)
+        {
+            await _productWriteRepository.RemoveAsync(id);
+
+            await _productWriteRepository.SaveAsync();
+            return Ok();
+        }
     }
 }
