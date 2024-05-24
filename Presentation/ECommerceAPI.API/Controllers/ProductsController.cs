@@ -1,4 +1,5 @@
 ﻿using ECommerceAPI.Application.Repositories;
+using ECommerceAPI.Application.ViewModels.Products;
 using ECommerceAPI.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -20,7 +21,15 @@ namespace ECommerceAPI.API.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var products = _productReadRepository.GetAll(false);
+            var products = _productReadRepository.GetAll(false).Select(p => new
+            {
+                p.Id,
+                p.Name,
+                p.Stock,
+                p.Price,
+                p.CreatedDate,
+                p.UpdatedDate
+            });
             return Ok(products);
         }
 
@@ -32,26 +41,30 @@ namespace ECommerceAPI.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(Product data)
+        public async Task<IActionResult> Post(CreateProductViewModel model)
         {
+            if (ModelState.IsValid)
+            {
+
+            }
             await _productWriteRepository.AddAsync(new()
             {
-                Name = data.Name,
-                Price = data.Price,
-                Stock = data.Stock,
+                Name = model.Name,
+                Price = model.Price,
+                Stock = model.Stock,
             });
             await _productWriteRepository.SaveAsync();
             return StatusCode((int)HttpStatusCode.Created);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Put(Product data)
+        public async Task<IActionResult> Put(UpdateProductViewModel model)
         {
-            Product product = await _productReadRepository.GetByIdAsync(data.Id.ToString());
+            Product product = await _productReadRepository.GetByIdAsync(model.Id.ToString());
 
-            product.Name = data.Name;
-            product.Price = data.Price;
-            product.Stock = data.Stock;
+            product.Name = model.Name;
+            product.Price = model.Price;
+            product.Stock = model.Stock;
 
             await _productWriteRepository.SaveAsync();
             return Ok();
