@@ -32,7 +32,7 @@ namespace ECommerceAPI.API.Controllers
                 p.CreatedDate,
                 p.UpdatedDate
             }).Skip(pagination.Page * pagination.Size).Take(pagination.Size);
-            
+
             return Ok(new
             {
                 totalCount,
@@ -77,7 +77,7 @@ namespace ECommerceAPI.API.Controllers
             return Ok();
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             await _productWriteRepository.RemoveAsync(id);
