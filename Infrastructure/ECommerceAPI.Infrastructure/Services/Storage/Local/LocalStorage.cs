@@ -39,7 +39,7 @@ namespace ECommerceAPI.Infrastructure.Services.Storage.Local
 
             foreach (IFormFile file in files)
             {
-                string newFileName = file.FileName; //file rename will add
+                string newFileName = file.FileName; //todo: file rename will add
 
                 await SaveAsync($"{uploadPath}\\{newFileName}", file);
 
