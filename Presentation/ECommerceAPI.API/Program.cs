@@ -1,8 +1,8 @@
+using ECommerceAPI.Application;
 using ECommerceAPI.Application.Validators.Products;
 using ECommerceAPI.Infrastructure;
 using ECommerceAPI.Infrastructure.Enums;
 using ECommerceAPI.Infrastructure.Filters;
-using ECommerceAPI.Infrastructure.Services.Storage.Local;
 using ECommerceAPI.Persistence;
 using FluentValidation.AspNetCore;
 
@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddPersistenceServices();
 builder.Services.AddInfrastructureServices();
-
+builder.Services.AddApplicationServices();
 
 builder.Services.AddStorage(StorageType.Local);
 
