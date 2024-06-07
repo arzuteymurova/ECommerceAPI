@@ -16,7 +16,8 @@ namespace ECommerceAPI.Application.Features.Commands.Product.CreateProduct
             {
                 Name = request.Name,
                 Price = request.Price,
-                Stock = request.Stock,
+
+
             });
             await _productWriteRepository.SaveAsync();
             return new();

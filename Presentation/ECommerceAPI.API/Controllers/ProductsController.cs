@@ -103,7 +103,8 @@ namespace ECommerceAPI.API.Controllers
         [HttpGet("[action]/{Id}")]
         public async Task<IActionResult> GetProductImages([FromRoute] GetProductImagesQueryRequest getProductImagesQueryRequest)
         {
-            
+            List<GetProductImagesQueryResponse> response = await _mediator.Send(getProductImagesQueryRequest);
+            return Ok();
         }
 
 
