@@ -1,5 +1,7 @@
-﻿using ECommerceAPI.Application.Abstractions.Storage;
+﻿using ECommerceAPI.Application.Abstractions.Identity;
+using ECommerceAPI.Application.Abstractions.Storage;
 using ECommerceAPI.Infrastructure.Enums;
+using ECommerceAPI.Infrastructure.Services.Identity;
 using ECommerceAPI.Infrastructure.Services.Storage;
 using ECommerceAPI.Infrastructure.Services.Storage.Local;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +13,7 @@ namespace ECommerceAPI.Infrastructure
         public static void AddInfrastructureServices(this IServiceCollection services)
         {
             services.AddScoped<IStorageService, StorageService>();
-
+            services.AddScoped<IJWTTokenService,JWTTokenService>();
         }
 
         public static void AddStorage(this IServiceCollection services, StorageType storageType)
