@@ -2,7 +2,7 @@
 
 namespace ECommerceAPI.Infrastructure.Services.Identity
 {
-    public class JWTOptions : IJWTOptions
+    public class JWTOptions 
     {
         public string Audience { get; set; }
         public string Issuer { get; set; }

@@ -7,7 +7,7 @@ namespace ECommerceAPI.Infrastructure.Services.Identity
 {
     public class JWTTokenService : IJWTTokenService
     {
-        public string GenerateJwt(IJWTOptions jwtSettings)
+        public string GenerateJwt(JWTOptions jwtSettings)
         {
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
             SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

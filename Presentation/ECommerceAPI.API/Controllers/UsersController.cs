@@ -1,6 +1,7 @@
 ﻿using ECommerceAPI.Application.Features.Commands.AppUser.CreateUser;
 using ECommerceAPI.Application.Features.Commands.AppUser.LoginUser;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace ECommerceAPI.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         readonly IMediator _mediator;
@@ -24,6 +26,7 @@ namespace ECommerceAPI.API.Controllers
             return Ok(response);
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginUserCommandRequest loginUserCommandRequest)
         {

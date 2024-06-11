@@ -1,4 +1,4 @@
-﻿using ECommerceAPI.Application.Abstractions.Identity;
+﻿using ECommerceAPI.Infrastructure.Services.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -49,7 +49,7 @@ namespace ECommerceAPI.API
 
             });
         }
-        public static void AuthenticationJwtSettings(this IServiceCollection services, IJWTOptions jwtSettings)
+        public static void AuthenticationJwtSettings(this IServiceCollection services, JWTOptions jwtSettings)
         {
             services.AddAuthentication(options =>
             {

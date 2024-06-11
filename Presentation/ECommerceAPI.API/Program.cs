@@ -7,8 +7,6 @@ using ECommerceAPI.Infrastructure.Filters;
 using ECommerceAPI.Infrastructure.Services.Identity;
 using ECommerceAPI.Persistence;
 using FluentValidation.AspNetCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 

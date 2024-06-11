@@ -40,7 +40,7 @@ namespace ECommerceAPI.Application.Features.Commands.AppUser.LoginUser
                 string token = _jwtTokenService.GenerateJwt(_jwtSettings);
                 return new LoginUserCommandResponse()
                 {
-                    Token = token
+                    AccessToken = token
                 };
 
             }
