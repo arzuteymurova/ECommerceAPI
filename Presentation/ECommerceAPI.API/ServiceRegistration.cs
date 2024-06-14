@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.VisualBasic;
 using System.Text;
 
 namespace ECommerceAPI.API
@@ -66,7 +67,8 @@ namespace ECommerceAPI.API
                          ValidIssuer = jwtSettings.Issuer,
                          ValidAudience = jwtSettings.Audience,
                          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
-                         ClockSkew = TimeSpan.Zero
+                         ClockSkew = TimeSpan.Zero,
+                         LifetimeValidator = (notBefore, expires, securityToken, validationParameters) => expires != null ? expires > DateTime.UtcNow : false
                      };
 
                  });

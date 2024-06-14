@@ -1,4 +1,6 @@
-﻿using ECommerceAPI.Application.Exceptions;
+﻿using ECommerceAPI.Application.Abstractions.Services;
+using ECommerceAPI.Application.DTOs.User;
+using ECommerceAPI.Application.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -6,35 +8,30 @@ namespace ECommerceAPI.Application.Features.Commands.AppUser.CreateUser
 {
     public class CreateUserCommandHandler : IRequestHandler<CreateUserCommandRequest, CreateUserCommandResponse>
     {
-        readonly UserManager<Domain.Entities.Identity.AppUser> _userManager;
+        readonly IUserService _userService;
 
-        public CreateUserCommandHandler(UserManager<Domain.Entities.Identity.AppUser> userManager)
+        public CreateUserCommandHandler(IUserService userService)
         {
-            _userManager = userManager;
+            _userService = userService;
         }
 
         public async Task<CreateUserCommandResponse> Handle(CreateUserCommandRequest request, CancellationToken cancellationToken)
         {
-            IdentityResult result  = await _userManager.CreateAsync(new Domain.Entities.Identity.AppUser()
+            CreateUserResponse response = await _userService.CreateAsync(new()
             {
+                Email = request.Email,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                Email = request.Email,
-                UserName = request.Username,
+                Password = request.Password,
+                PasswordConfirm = request.PasswordConfirm,
+                Username = request.Username,
+            });
 
-            }, request.Password);
-
-            if(result.Succeeded)
+            return new()
             {
-                return new()
-                {
-                    Succeeded = true,
-                    Message = "User created successfully!"
-                };
-            }
-            
-            throw new UserCreateFailedException();
-           
+                Message = response.Message,
+                Succeeded = response.Succeeded,
+            };
         }
     }
 }

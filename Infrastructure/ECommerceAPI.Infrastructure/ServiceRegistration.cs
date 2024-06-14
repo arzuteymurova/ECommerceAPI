@@ -1,6 +1,9 @@
 ﻿using ECommerceAPI.Application.Abstractions.Identity;
+using ECommerceAPI.Application.Abstractions.Services;
+using ECommerceAPI.Application.Abstractions.Services.Authentications;
 using ECommerceAPI.Application.Abstractions.Storage;
 using ECommerceAPI.Infrastructure.Enums;
+using ECommerceAPI.Infrastructure.Services;
 using ECommerceAPI.Infrastructure.Services.Identity;
 using ECommerceAPI.Infrastructure.Services.Storage;
 using ECommerceAPI.Infrastructure.Services.Storage.Local;
@@ -14,6 +17,12 @@ namespace ECommerceAPI.Infrastructure
         {
             services.AddScoped<IStorageService, StorageService>();
             services.AddScoped<IJWTTokenService,JWTTokenService>();
+
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IExternalAuthentication, AuthService>();
+            services.AddScoped<IInternalAuthentication, AuthService>();
+
         }
 
         public static void AddStorage(this IServiceCollection services, StorageType storageType)

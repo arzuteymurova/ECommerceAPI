@@ -16,7 +16,7 @@ namespace ECommerceAPI.API.Controllers
 
         public UsersController(IMediator mediator)
         {
-            _mediator=mediator;
+            _mediator = mediator;
         }
 
         [HttpPost("register")]
@@ -26,19 +26,5 @@ namespace ECommerceAPI.API.Controllers
             return Ok(response);
         }
 
-        [AllowAnonymous]
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginUserCommandRequest loginUserCommandRequest)
-        {
-            LoginUserCommandResponse response = await _mediator.Send(loginUserCommandRequest);
-            return Ok(response);
-        }
-
-        [HttpPost("google-login")]
-        public async Task<IActionResult> GoogleLogin(GoogleLoginCommandRequest googleLoginCommandRequest)
-        {
-            GoogleLoginCommandResponse response = await _mediator.Send(googleLoginCommandRequest);
-            return Ok(response);
-        }
     }
 }

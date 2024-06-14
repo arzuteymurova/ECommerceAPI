@@ -1,7 +1,7 @@
 ﻿using ECommerceAPI.Infrastructure.Operations;
 using Microsoft.AspNetCore.Hosting;
 
-namespace ECommerceAPI.Infrastructure.Services
+namespace ECommerceAPI.Infrastructure.Services.Helpers
 {
     public class FileService
     {
