@@ -1,9 +1,11 @@
-﻿using ECommerceAPI.Infrastructure.Services.Identity;
+﻿using ECommerceAPI.Application.DTOs;
+using ECommerceAPI.Infrastructure.Services.Identity;
 
 namespace ECommerceAPI.Application.Abstractions.Identity
 {
     public interface IJWTTokenService
     {
-        string GenerateJwt(JWTOptions jwtSettings);
+        Token GenerateAccessToken(JWTOptions jwtSettings);
+        string GenerateRefreshToken();
     }
 }

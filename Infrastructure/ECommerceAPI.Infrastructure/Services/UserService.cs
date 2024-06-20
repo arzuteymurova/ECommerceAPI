@@ -36,5 +36,15 @@ namespace ECommerceAPI.Infrastructure.Services
 
             return response;
         }
+
+        public async Task UpdateRefreshTokenAsync(string refreshToken, AppUser user, DateTime accessTokenDate, int refreshTokenLifeTime)
+        {
+            if (user != null)
+            {
+                user.RefreshToken = refreshToken;
+                user.RefreshTokenEndDate = accessTokenDate.AddMinutes(refreshTokenLifeTime);
+                await _userManager.UpdateAsync(user);
+            }
+        }
     }
 }

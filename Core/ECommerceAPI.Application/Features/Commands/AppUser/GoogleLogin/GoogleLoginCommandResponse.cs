@@ -1,7 +1,9 @@
-﻿namespace ECommerceAPI.Application.Features.Commands.AppUser.GoogleLogin
+﻿using ECommerceAPI.Application.DTOs;
+
+namespace ECommerceAPI.Application.Features.Commands.AppUser.GoogleLogin
 {
     public class GoogleLoginCommandResponse
     {
-        public string AccessToken { get; set; }
+        public Token Token { get; set; }
     }
 }

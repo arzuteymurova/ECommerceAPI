@@ -8,5 +8,6 @@ namespace ECommerceAPI.Infrastructure.Services.Identity
         public string Issuer { get; set; }
         public string SecretKey { get; set; }
         public int ExpirationInMinutes { get; set; }
+        public int RefreshTokenLifeTime { get; set; }
     }
 }

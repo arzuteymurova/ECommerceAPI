@@ -1,14 +1,13 @@
 ﻿using ECommerceAPI.Application.Abstractions.Identity;
 using ECommerceAPI.Application.Abstractions.Services;
+using ECommerceAPI.Application.DTOs;
 using ECommerceAPI.Application.DTOs.User;
 using ECommerceAPI.Application.Exceptions;
-using ECommerceAPI.Application.Features.Commands.AppUser.GoogleLogin;
-using ECommerceAPI.Application.Features.Commands.AppUser.LoginUser;
 using ECommerceAPI.Domain.Entities.Identity;
 using ECommerceAPI.Infrastructure.Services.Identity;
 using Google.Apis.Auth;
-using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
@@ -21,14 +20,16 @@ namespace ECommerceAPI.Infrastructure.Services
         readonly SignInManager<AppUser> _signInManager;
         readonly IJWTTokenService _jwtTokenService;
         readonly JWTOptions _jwtSettings;
+        readonly IUserService _userService;
 
-        public AuthService(IConfiguration configuration, UserManager<AppUser> userManager, IJWTTokenService jwtTokenService, IOptionsSnapshot<JWTOptions> jwtSettings, SignInManager<AppUser> signInManager)
+        public AuthService(IConfiguration configuration, UserManager<AppUser> userManager, IJWTTokenService jwtTokenService, IOptionsSnapshot<JWTOptions> jwtSettings, SignInManager<AppUser> signInManager, IUserService userService)
         {
             _configuration = configuration;
             _userManager = userManager;
             _jwtTokenService = jwtTokenService;
             _jwtSettings = jwtSettings.Value;
             _signInManager = signInManager;
+            _userService = userService;
         }
 
         private async Task<LoginUserResponse> CreateExternalUserAsync(AppUser user, string email, string firstName, string lastName, UserLoginInfo info)
@@ -58,10 +59,12 @@ namespace ECommerceAPI.Infrastructure.Services
             if (result)
             {
                 var addLoginResult = await _userManager.AddLoginAsync(user, info);
-                string accessToken = _jwtTokenService.GenerateJwt(_jwtSettings);
+                Token token = _jwtTokenService.GenerateAccessToken(_jwtSettings);
+                await _userService.UpdateRefreshTokenAsync(token.RefreshToken, user, DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationInMinutes), _jwtSettings.RefreshTokenLifeTime);
+
                 return new()
                 {
-                    AccessToken = accessToken,
+                    Token = token,
                 };
             }
 
@@ -97,14 +100,28 @@ namespace ECommerceAPI.Infrastructure.Services
 
             if (result.Succeeded)
             {
-                string token = _jwtTokenService.GenerateJwt(_jwtSettings);
+                Token token = _jwtTokenService.GenerateAccessToken(_jwtSettings);
+                await _userService.UpdateRefreshTokenAsync(token.RefreshToken, user, DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationInMinutes), _jwtSettings.RefreshTokenLifeTime);
 
                 return new LoginUserResponse()
                 {
-                    AccessToken = token
+                    Token = token
                 };
             }
             throw new AuthenticationErrorException();
+        }
+
+        public async Task<Token> RefreshTokenLoginAsync(string refreshToken)
+        {
+            AppUser user = await _userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+            if (user != null && user?.RefreshTokenEndDate > DateTime.UtcNow)
+            {
+                Token token = _jwtTokenService.GenerateAccessToken(_jwtSettings);
+                await _userService.UpdateRefreshTokenAsync(token.RefreshToken, user, DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationInMinutes), _jwtSettings.RefreshTokenLifeTime);
+                return token;
+            }
+            else
+                throw new NotFoundUserException();
         }
     }
 }

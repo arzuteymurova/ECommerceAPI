@@ -19,7 +19,7 @@ namespace ECommerceAPI.Application.Features.Commands.AppUser.GoogleLogin
 
             return new()
             {
-                AccessToken = loginUserResponse.AccessToken,
+                Token = loginUserResponse.Token,
             };
         }
 

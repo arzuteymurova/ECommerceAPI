@@ -1,13 +1,15 @@
 ﻿using ECommerceAPI.Application.Abstractions.Identity;
+using ECommerceAPI.Application.DTOs;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace ECommerceAPI.Infrastructure.Services.Identity
 {
     public class JWTTokenService : IJWTTokenService
     {
-        public string GenerateJwt(JWTOptions jwtSettings)
+        public Token GenerateAccessToken(JWTOptions jwtSettings)
         {
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
             SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -21,7 +23,22 @@ namespace ECommerceAPI.Infrastructure.Services.Identity
                 signingCredentials: credentials
             );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            string accessToken = new JwtSecurityTokenHandler().WriteToken(token);
+            string refreshToken = GenerateRefreshToken();
+
+            return new Token()
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            };
+        }
+
+        public string GenerateRefreshToken()
+        {
+            byte[] number = new byte[32];
+            using RandomNumberGenerator random = RandomNumberGenerator.Create();
+            random.GetBytes(number);
+            return Convert.ToBase64String(number);
         }
     }
 }

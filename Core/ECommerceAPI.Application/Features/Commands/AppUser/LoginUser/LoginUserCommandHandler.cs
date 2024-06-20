@@ -20,7 +20,7 @@ namespace ECommerceAPI.Application.Features.Commands.AppUser.LoginUser
 
             return new()
             {
-                AccessToken = loginUserResponse.AccessToken,
+                Token = loginUserResponse.Token,
             };
         }
     }
