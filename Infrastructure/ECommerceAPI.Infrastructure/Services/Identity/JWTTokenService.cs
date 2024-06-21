@@ -1,7 +1,9 @@
 ﻿using ECommerceAPI.Application.Abstractions.Identity;
 using ECommerceAPI.Application.DTOs;
+using ECommerceAPI.Domain.Entities.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -9,18 +11,19 @@ namespace ECommerceAPI.Infrastructure.Services.Identity
 {
     public class JWTTokenService : IJWTTokenService
     {
-        public Token GenerateAccessToken(JWTOptions jwtSettings)
+        public Token GenerateAccessToken(JWTOptions jwtSettings, AppUser user)
         {
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
             SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             DateTime accessTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToInt32(jwtSettings.ExpirationInMinutes));
 
+
             JwtSecurityToken token = new(
                 issuer: jwtSettings.Issuer,
-
                 audience: jwtSettings.Audience,
                 expires: accessTokenExpiration,
-                signingCredentials: credentials
+                signingCredentials: credentials,
+                claims: new List<Claim> { new(ClaimTypes.Name, user.UserName) }
             );
 
             string accessToken = new JwtSecurityTokenHandler().WriteToken(token);

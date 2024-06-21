@@ -59,7 +59,7 @@ namespace ECommerceAPI.Infrastructure.Services
             if (result)
             {
                 var addLoginResult = await _userManager.AddLoginAsync(user, info);
-                Token token = _jwtTokenService.GenerateAccessToken(_jwtSettings);
+                Token token = _jwtTokenService.GenerateAccessToken(_jwtSettings,user);
                 await _userService.UpdateRefreshTokenAsync(token.RefreshToken, user, DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationInMinutes), _jwtSettings.RefreshTokenLifeTime);
 
                 return new()
@@ -100,7 +100,7 @@ namespace ECommerceAPI.Infrastructure.Services
 
             if (result.Succeeded)
             {
-                Token token = _jwtTokenService.GenerateAccessToken(_jwtSettings);
+                Token token = _jwtTokenService.GenerateAccessToken(_jwtSettings, user);
                 await _userService.UpdateRefreshTokenAsync(token.RefreshToken, user, DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationInMinutes), _jwtSettings.RefreshTokenLifeTime);
 
                 return new LoginUserResponse()
@@ -116,7 +116,7 @@ namespace ECommerceAPI.Infrastructure.Services
             AppUser user = await _userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
             if (user != null && user?.RefreshTokenEndDate > DateTime.UtcNow)
             {
-                Token token = _jwtTokenService.GenerateAccessToken(_jwtSettings);
+                Token token = _jwtTokenService.GenerateAccessToken(_jwtSettings, user);
                 await _userService.UpdateRefreshTokenAsync(token.RefreshToken, user, DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationInMinutes), _jwtSettings.RefreshTokenLifeTime);
                 return token;
             }
