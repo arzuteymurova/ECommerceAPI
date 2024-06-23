@@ -13,7 +13,7 @@ namespace ECommerceAPI.Application.Features.Queries.Product.GetAllProduct
         }
         public async Task<GetAllProductQueryResponse> Handle(GetAllProductQueryRequest request, CancellationToken cancellationToken)
         {
-            var totalCount = _productReadRepository.GetAll(false).Count();
+            var totalProductCount = _productReadRepository.GetAll(false).Count();
             var products = await _productReadRepository.GetAll(false).Select(p => new
             {
                 p.Id,
@@ -27,7 +27,7 @@ namespace ECommerceAPI.Application.Features.Queries.Product.GetAllProduct
             return new GetAllProductQueryResponse()
             {
                 Products = products,
-                TotalCount = totalCount
+                TotalProductCount = totalProductCount
             };
         }
     }
