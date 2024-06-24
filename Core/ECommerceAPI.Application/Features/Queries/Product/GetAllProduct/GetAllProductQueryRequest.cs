@@ -6,7 +6,7 @@ namespace ECommerceAPI.Application.Features.Queries.Product.GetAllProduct
     {
         //public Pagination Pagination { get; set; }
         public int Page { get; set; } = 0;
-        public int Size { get; set; } = 5;
+        public int Size { get; set; } = 12;
     }
 
 }

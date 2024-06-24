@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ECommerceAPI.Persistence.Migrations
 {
     [DbContext(typeof(ECommerceDbContext))]
-    [Migration("20240622163103_mig1")]
-    partial class mig1
+    [Migration("20240624102723_mig2")]
+    partial class mig2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -386,6 +386,9 @@ namespace ECommerceAPI.Persistence.Migrations
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.ProductImageFile", b =>
                 {
                     b.HasBaseType("ECommerceAPI.Domain.Entities.File");
+
+                    b.Property<bool>("Showcase")
+                        .HasColumnType("bit");
 
                     b.HasDiscriminator().HasValue("ProductImageFile");
                 });

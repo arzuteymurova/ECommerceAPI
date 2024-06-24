@@ -14,15 +14,18 @@ namespace ECommerceAPI.Application.Features.Queries.Product.GetAllProduct
         public async Task<GetAllProductQueryResponse> Handle(GetAllProductQueryRequest request, CancellationToken cancellationToken)
         {
             var totalProductCount = _productReadRepository.GetAll(false).Count();
-            var products = await _productReadRepository.GetAll(false).Select(p => new
+            var products = await _productReadRepository.GetAll(false).Skip(request.Page * request.Size).Take(request.Size)
+            .Include(p => p.ProductImageFiles)
+            .Select(p => new
             {
                 p.Id,
                 p.Name,
                 p.Stock,
                 p.Price,
                 p.CreatedDate,
-                p.UpdatedDate
-            }).Skip(request.Page * request.Size).Take(request.Size).ToListAsync();
+                p.UpdatedDate,
+                p.ProductImageFiles
+            }).ToListAsync();
 
             return new GetAllProductQueryResponse()
             {
