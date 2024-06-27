@@ -33,11 +33,11 @@ namespace ECommerceAPI.Persistence.Repositories
             return query;
         }
 
-        public async Task<T> GetByIdAsync(string id, bool tracking = true)
+        public async Task<T> GetByIdAsync(Guid id, bool tracking = true)
         {
             IQueryable<T> query = tracking ? Table.AsQueryable() : Table.AsNoTracking();
 
-            return await query.FirstOrDefaultAsync(data => data.Id == Guid.Parse(id));
+            return await query.FirstOrDefaultAsync(data => data.Id == id);
         }
 
         public async Task<T> GetSingleAsync(Expression<Func<T, bool>> method, bool tracking = true)

@@ -23,6 +23,8 @@ namespace ECommerceAPI.Infrastructure
             services.AddScoped<IExternalAuthentication, AuthService>();
             services.AddScoped<IInternalAuthentication, AuthService>();
 
+            services.AddScoped<IBasketService, BasketService>();
+
         }
 
         public static void AddStorage(this IServiceCollection services, StorageType storageType)

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ECommerceAPI.Persistence.Migrations
 {
     [DbContext(typeof(ECommerceDbContext))]
-    [Migration("20240624102723_mig2")]
-    partial class mig2
+    [Migration("20240627082710_mig1")]
+    partial class mig1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,62 @@ namespace ECommerceAPI.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.Basket", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId1")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId1");
+
+                    b.ToTable("Baskets");
+                });
+
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.BasketItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BasketId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BasketId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("BasketItems");
+                });
 
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.Customer", b =>
                 {
@@ -192,7 +248,6 @@ namespace ECommerceAPI.Persistence.Migrations
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.Order", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Address")
@@ -201,9 +256,6 @@ namespace ECommerceAPI.Persistence.Migrations
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -217,8 +269,6 @@ namespace ECommerceAPI.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
 
                     b.ToTable("Orders");
                 });
@@ -236,9 +286,6 @@ namespace ECommerceAPI.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("OrderId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<float>("Price")
                         .HasColumnType("real");
 
@@ -249,8 +296,6 @@ namespace ECommerceAPI.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
 
                     b.ToTable("Products");
                 });
@@ -393,22 +438,45 @@ namespace ECommerceAPI.Persistence.Migrations
                     b.HasDiscriminator().HasValue("ProductImageFile");
                 });
 
-            modelBuilder.Entity("ECommerceAPI.Domain.Entities.Order", b =>
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.Basket", b =>
                 {
-                    b.HasOne("ECommerceAPI.Domain.Entities.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
+                    b.HasOne("ECommerceAPI.Domain.Entities.Identity.AppUser", "User")
+                        .WithMany("Baskets")
+                        .HasForeignKey("UserId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Customer");
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ECommerceAPI.Domain.Entities.Product", b =>
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.BasketItem", b =>
                 {
-                    b.HasOne("ECommerceAPI.Domain.Entities.Order", null)
-                        .WithMany("Products")
-                        .HasForeignKey("OrderId");
+                    b.HasOne("ECommerceAPI.Domain.Entities.Basket", "Basket")
+                        .WithMany("BasketItems")
+                        .HasForeignKey("BasketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECommerceAPI.Domain.Entities.Product", "Product")
+                        .WithMany("BasketItems")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Basket");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.Order", b =>
+                {
+                    b.HasOne("ECommerceAPI.Domain.Entities.Basket", "Basket")
+                        .WithOne("Order")
+                        .HasForeignKey("ECommerceAPI.Domain.Entities.Order", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Basket");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -477,9 +545,22 @@ namespace ECommerceAPI.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ECommerceAPI.Domain.Entities.Order", b =>
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.Basket", b =>
                 {
-                    b.Navigation("Products");
+                    b.Navigation("BasketItems");
+
+                    b.Navigation("Order")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.Identity.AppUser", b =>
+                {
+                    b.Navigation("Baskets");
+                });
+
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.Product", b =>
+                {
+                    b.Navigation("BasketItems");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,6 +1,6 @@
 ﻿namespace ECommerceAPI.Application.DTOs.User
 {
-    public class LoginUserResponse
+    public class LoginUserResponseDto
     {
        public Token Token { get; set; }
     }

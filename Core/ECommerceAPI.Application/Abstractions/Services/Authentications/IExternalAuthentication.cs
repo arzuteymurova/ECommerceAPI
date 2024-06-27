@@ -4,6 +4,6 @@ namespace ECommerceAPI.Application.Abstractions.Services.Authentications
 {
     public interface IExternalAuthentication
     {
-        Task<LoginUserResponse> GoogleLoginAsync(string authToken);
+        Task<LoginUserResponseDto> GoogleLoginAsync(string authToken);
     }
 }

@@ -1,6 +1,5 @@
 ﻿using ECommerceAPI.Application.Abstractions.Services;
 using ECommerceAPI.Application.DTOs.User;
-using ECommerceAPI.Application.Exceptions;
 using ECommerceAPI.Domain.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 
@@ -15,7 +14,7 @@ namespace ECommerceAPI.Infrastructure.Services
             _userManager = userManager;
         }
 
-        public async Task<CreateUserResponse> CreateAsync(CreateUserRequest model)
+        public async Task<CreateUserResponseDto> CreateAsync(CreateUserRequestDto model)
         {
             IdentityResult result = await _userManager.CreateAsync(new AppUser()
             {
@@ -26,7 +25,7 @@ namespace ECommerceAPI.Infrastructure.Services
 
             }, model.Password);
 
-            CreateUserResponse response = new() { Succeeded = result.Succeeded };
+            CreateUserResponseDto response = new() { Succeeded = result.Succeeded };
 
             if (result.Succeeded)
                 response.Message = "User created successfully!";

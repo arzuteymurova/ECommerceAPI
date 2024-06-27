@@ -1,6 +1,6 @@
 ﻿namespace ECommerceAPI.Application.DTOs.User
 {
-    public class CreateUserRequest
+    public class CreateUserRequestDto
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
