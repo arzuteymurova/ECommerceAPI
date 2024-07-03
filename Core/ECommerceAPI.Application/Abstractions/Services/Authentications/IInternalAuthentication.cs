@@ -5,7 +5,7 @@ namespace ECommerceAPI.Application.Abstractions.Services.Authentications
 {
     public interface IInternalAuthentication
     {
-        Task<LoginUserResponseDto> LoginAsync(string usernameOrEmail, string password);
+        Task<LoginUserResponse> LoginAsync(string usernameOrEmail, string password);
         Task<Token> RefreshTokenLoginAsync(string refreshToken);
     }
 }

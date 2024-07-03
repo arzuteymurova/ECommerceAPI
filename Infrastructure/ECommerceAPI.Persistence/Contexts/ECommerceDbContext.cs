@@ -27,11 +27,11 @@ namespace ECommerceAPI.Persistence.Contexts
         {
             builder.Entity<Order>()
                 .HasKey(b => b.Id);
-            
+
             builder.Entity<Basket>()
-                .HasOne(b=>b.Order)
-                .WithOne(o=>o.Basket)
-                .HasForeignKey<Order>(b=>b.Id);
+                .HasOne(b => b.Order)
+                .WithOne(o => o.Basket)
+                .HasForeignKey<Order>(b => b.Id);
 
             base.OnModelCreating(builder);
         }

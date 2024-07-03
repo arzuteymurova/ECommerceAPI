@@ -14,7 +14,7 @@ namespace ECommerceAPI.Infrastructure.Services
             _userManager = userManager;
         }
 
-        public async Task<CreateUserResponseDto> CreateAsync(CreateUserRequestDto model)
+        public async Task<CreateUserResponse> CreateAsync(CreateUser model)
         {
             IdentityResult result = await _userManager.CreateAsync(new AppUser()
             {
@@ -25,7 +25,7 @@ namespace ECommerceAPI.Infrastructure.Services
 
             }, model.Password);
 
-            CreateUserResponseDto response = new() { Succeeded = result.Succeeded };
+            CreateUserResponse response = new() { Succeeded = result.Succeeded };
 
             if (result.Succeeded)
                 response.Message = "User created successfully!";

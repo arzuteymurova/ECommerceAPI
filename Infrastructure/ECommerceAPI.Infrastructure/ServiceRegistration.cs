@@ -24,6 +24,7 @@ namespace ECommerceAPI.Infrastructure
             services.AddScoped<IInternalAuthentication, AuthService>();
 
             services.AddScoped<IBasketService, BasketService>();
+            services.AddScoped<IOrderService,OrderService>();   
 
         }
 

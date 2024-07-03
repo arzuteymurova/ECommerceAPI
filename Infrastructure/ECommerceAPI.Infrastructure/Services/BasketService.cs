@@ -81,7 +81,7 @@ namespace ECommerceAPI.Infrastructure.Services
                 throw new UserNameIsNullOrEmptyException();
         }
 
-        public async Task AddItemToBasketAsync(CreateBasketItemRequestDto createBasketItem)
+        public async Task AddItemToBasketAsync(CreateBasketItem createBasketItem)
         {
             Basket? basket = await ContextUserBasket();
 
@@ -127,7 +127,7 @@ namespace ECommerceAPI.Infrastructure.Services
             }
         }
 
-        public async Task UpdateQuantityAsync(UpdateBasketItemRequestDto updateBasketItem)
+        public async Task UpdateQuantityAsync(UpdateBasketItem updateBasketItem)
         {
             BasketItem? basketItem = await _basketItemReadRepository.GetByIdAsync(updateBasketItem.BasketItemId);
 
@@ -137,6 +137,5 @@ namespace ECommerceAPI.Infrastructure.Services
                 await _basketItemWriteRepository.SaveAsync();
             }
         }
-
     }
 }

@@ -1,8 +1,8 @@
 ﻿namespace ECommerceAPI.Application.DTOs.Basket
 {
-    public class UpdateBasketItemRequestDto
+    public class CreateBasketItem
     {
-        public Guid BasketItemId { get; set; }
+        public Guid ProductId { get; set; }
         public int Quantity { get; set; }
     }
 }

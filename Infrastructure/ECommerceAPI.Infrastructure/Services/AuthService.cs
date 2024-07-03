@@ -32,7 +32,7 @@ namespace ECommerceAPI.Infrastructure.Services
             _userService = userService;
         }
 
-        private async Task<LoginUserResponseDto> CreateExternalUserAsync(AppUser user, string email, string firstName, string lastName, UserLoginInfo info)
+        private async Task<LoginUserResponse> CreateExternalUserAsync(AppUser user, string email, string firstName, string lastName, UserLoginInfo info)
         {
             bool result = user != null;
 
@@ -72,7 +72,7 @@ namespace ECommerceAPI.Infrastructure.Services
         }
 
 
-        public async Task<LoginUserResponseDto> GoogleLoginAsync(string authToken)
+        public async Task<LoginUserResponse> GoogleLoginAsync(string authToken)
         {
             var settings = new GoogleJsonWebSignature.ValidationSettings
             {
@@ -87,7 +87,7 @@ namespace ECommerceAPI.Infrastructure.Services
             return await CreateExternalUserAsync(user, payload.Email, payload.GivenName, payload.FamilyName, info);
         }
 
-        public async Task<LoginUserResponseDto> LoginAsync(string usernameOrEmail, string password)
+        public async Task<LoginUserResponse> LoginAsync(string usernameOrEmail, string password)
         {
             AppUser user = await _userManager.FindByNameAsync(usernameOrEmail);
 
@@ -103,7 +103,7 @@ namespace ECommerceAPI.Infrastructure.Services
                 Token token = _jwtTokenService.GenerateAccessToken(_jwtSettings, user);
                 await _userService.UpdateRefreshTokenAsync(token.RefreshToken, user, DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationInMinutes), _jwtSettings.RefreshTokenLifeTime);
 
-                return new LoginUserResponseDto()
+                return new LoginUserResponse()
                 {
                     Token = token
                 };

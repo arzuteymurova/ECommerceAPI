@@ -17,7 +17,7 @@ namespace ECommerceAPI.Application.Features.Commands.AppUser.CreateUser
 
         public async Task<CreateUserCommandResponse> Handle(CreateUserCommandRequest request, CancellationToken cancellationToken)
         {
-            CreateUserResponseDto response = await _userService.CreateAsync(new()
+            CreateUserResponse response = await _userService.CreateAsync(new()
             {
                 Email = request.Email,
                 FirstName = request.FirstName,
