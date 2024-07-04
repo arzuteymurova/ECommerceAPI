@@ -1,16 +1,20 @@
 ﻿using ECommerceAPI.Application.Abstractions.Services;
+using ECommerceAPI.Application.DTOs;
 using ECommerceAPI.Application.DTOs.Order;
 using ECommerceAPI.Application.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceAPI.Infrastructure.Services
 {
     public class OrderService : IOrderService
     {
         private readonly IOrderWriteRepository _orderWriteRepository;
+        private readonly IOrderReadRepository _orderReadRepository;
 
-        public OrderService(IOrderWriteRepository orderWriteRepository)
+        public OrderService(IOrderWriteRepository orderWriteRepository, IOrderReadRepository orderReadRepository)
         {
             _orderWriteRepository = orderWriteRepository;
+            _orderReadRepository = orderReadRepository;
         }
 
         public async Task CreateOrderAsync(CreateOrder createOrder)
@@ -28,6 +32,56 @@ namespace ECommerceAPI.Infrastructure.Services
 
             await _orderWriteRepository.SaveAsync();
 
+        }
+
+        public async Task<ListOrder> GetAllOrdersAsync(int page, int size)
+        {
+            var query = _orderReadRepository.Table
+                .Include(o => o.Basket)
+                    .ThenInclude(b => b.User)
+                .Include(o => o.Basket)
+                    .ThenInclude(b => b.BasketItems)
+                    .ThenInclude(bi => bi.Product);
+
+            var data = query.Skip(page * size).Take(size);
+
+            return new()
+            {
+                TotalOrderCount = await query.CountAsync(),
+                Orders = await data.Select(o => new
+                {
+                    Id = o.Id,
+                    CreatedDate = o.CreatedDate,
+                    OrderCode = o.OrderCode,
+                    TotalPrice = o.Basket.BasketItems.Sum(bi => bi.Product.Price * bi.Quantity),
+                    UserName = o.Basket.User.UserName
+                }).ToListAsync()
+            };
+        }
+
+        public async Task<SingleOrder> GetOrderByIdAsync(Guid id)
+        {
+            var query = _orderReadRepository.Table
+              .Include(o => o.Basket)
+                  .ThenInclude(b => b.BasketItems)
+                  .ThenInclude(bi => bi.Product);
+
+            var data = await query.FirstOrDefaultAsync(o => o.Id == id);
+
+            return new SingleOrder()
+            {
+                Id = data.Id,
+                OrderCode = data.OrderCode,
+                Address = data.Address,
+                Description = data.Description,
+                CreatedDate = data.CreatedDate,
+                BasketItems = data.Basket.BasketItems.Select(bi => new
+                {
+                    bi.Product.Name,
+                    bi.Product.Price,
+                    bi.Quantity
+                })
+            };
         }
     }
 }
