@@ -17,6 +17,7 @@ namespace ECommerceAPI.Infrastructure
         {
             services.AddScoped<IStorageService, StorageService>();
             services.AddScoped<IJWTTokenService,JWTTokenService>();
+            services.AddScoped<IMailService,MailService>();
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
