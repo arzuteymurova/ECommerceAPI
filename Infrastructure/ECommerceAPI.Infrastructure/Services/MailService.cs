@@ -1,4 +1,5 @@
 ﻿using ECommerceAPI.Application.Abstractions.Services;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Net.Mail;
@@ -41,18 +42,18 @@ namespace ECommerceAPI.Infrastructure.Services
             await smtpClient.SendMailAsync(mail);
         }
 
-        public async Task SendResetPasswordMailAsync(string to, string userId, string resetToken)
+        public async Task SendResetPasswordMailAsync(string to, Guid userId, string resetToken)
         {
             StringBuilder mail = new();
-            mail.AppendLine("If you want to reset your password, click the below link.<br><strong><a target=\"_blank\" href=\"");
-            mail.AppendLine(_configuration["AngularClientUrl"]);
-            mail.AppendLine("/update-password/");
-            mail.AppendLine(userId);
-            mail.AppendLine("/");
-            mail.AppendLine(resetToken);
-            mail.AppendLine("\"></a></strong><br><br><span style=\"font-size:12px;\"><br><br><br>E-Commerce");
+            mail.Append("Merhaba<br>Eğer yeni şifre talebinde bulunduysanız aşağıdaki linkten şifrenizi yenileyebilirsiniz.<br><strong><a target=\"_blank\" href=\"");
+            mail.Append(_configuration["AngularClientUrl"]);
+            mail.Append("/update-password/");
+            mail.Append(userId.ToString());
+            mail.Append("/");
+            mail.Append(resetToken);
+            mail.Append("\">Yeni şifre talebi için tıklayınız...</a></strong><br><br><span style=\"font-size:12px;\">NOT : Eğer ki bu talep tarafınızca gerçekleştirilmemişse lütfen bu maili ciddiye almayınız.</span><br>Saygılarımızla...<br><br><br>NG - Mini|E-Ticaret");
 
-            await SendMailAsync(to, "Reset Password", mail.ToString());
+            await SendMailAsync(to, "Şifre Yenileme Talebi", mail.ToString());
         }
     }
 }

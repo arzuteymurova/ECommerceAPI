@@ -2,6 +2,7 @@
 using ECommerceAPI.Application.Features.Commands.AppUser.CreateUser;
 using ECommerceAPI.Application.Features.Commands.AppUser.GoogleLogin;
 using ECommerceAPI.Application.Features.Commands.AppUser.LoginUser;
+using ECommerceAPI.Application.Features.Commands.AppUser.UpdatePassword;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,8 +33,15 @@ namespace ECommerceAPI.API.Controllers
         [HttpGet]
         public async Task<IActionResult> SendMail()
         {
-            await _mailService.SendMailAsync("arzuteymurova02@gmail.com", "ECom merce", "<h4>Welcome to sote!<h4>");
+            await _mailService.SendMailAsync("arzuteymurova02@gmail.com", "ECommerce", "<h4>Welcome to sote!<h4>");
             return Ok();
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> UpdatePassword(UpdatePasswordCommandRequest updatePasswordCommandRequest)
+        {
+            UpdatePasswordCommandResponse response = await _mediator.Send(updatePasswordCommandRequest);
+            return Ok(response);
         }
 
     }

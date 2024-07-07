@@ -3,13 +3,16 @@ using ECommerceAPI.Application.Abstractions.Services;
 using ECommerceAPI.Application.DTOs;
 using ECommerceAPI.Application.DTOs.User;
 using ECommerceAPI.Application.Exceptions;
+using ECommerceAPI.Application.Helpers;
 using ECommerceAPI.Domain.Entities.Identity;
 using ECommerceAPI.Infrastructure.Services.Identity;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using System.Text;
 
 namespace ECommerceAPI.Infrastructure.Services
 {
@@ -21,8 +24,9 @@ namespace ECommerceAPI.Infrastructure.Services
         readonly IJWTTokenService _jwtTokenService;
         readonly JWTOptions _jwtSettings;
         readonly IUserService _userService;
+        readonly IMailService _mailService;
 
-        public AuthService(IConfiguration configuration, UserManager<AppUser> userManager, IJWTTokenService jwtTokenService, IOptionsSnapshot<JWTOptions> jwtSettings, SignInManager<AppUser> signInManager, IUserService userService)
+        public AuthService(IConfiguration configuration, UserManager<AppUser> userManager, IJWTTokenService jwtTokenService, IOptionsSnapshot<JWTOptions> jwtSettings, SignInManager<AppUser> signInManager, IUserService userService, IMailService mailService)
         {
             _configuration = configuration;
             _userManager = userManager;
@@ -30,6 +34,7 @@ namespace ECommerceAPI.Infrastructure.Services
             _jwtSettings = jwtSettings.Value;
             _signInManager = signInManager;
             _userService = userService;
+            _mailService = mailService;
         }
 
         private async Task<LoginUserResponse> CreateExternalUserAsync(AppUser user, string email, string firstName, string lastName, UserLoginInfo info)
@@ -59,7 +64,7 @@ namespace ECommerceAPI.Infrastructure.Services
             if (result)
             {
                 var addLoginResult = await _userManager.AddLoginAsync(user, info);
-                Token token = _jwtTokenService.GenerateAccessToken(_jwtSettings,user);
+                Token token = _jwtTokenService.GenerateAccessToken(_jwtSettings, user);
                 await _userService.UpdateRefreshTokenAsync(token.RefreshToken, user, DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationInMinutes), _jwtSettings.RefreshTokenLifeTime);
 
                 return new()
@@ -122,6 +127,30 @@ namespace ECommerceAPI.Infrastructure.Services
             }
             else
                 throw new UserNotFoundException();
+        }
+
+        public async Task ResetPasswordAsync(string email)
+        {
+            AppUser user = await _userManager.FindByEmailAsync(email);
+            if (user != null)
+            {
+                string resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+                resetToken = resetToken.UrlEncode();
+
+                await _mailService.SendResetPasswordMailAsync(email, user.Id, resetToken);
+            }
+        }
+
+        public async Task<bool> VerifyResetTokenAsync(Guid userId, string resetToken)
+        {
+            AppUser user = await _userManager.FindByIdAsync(userId.ToString());
+
+            if (user != null)
+            {
+                resetToken = resetToken.UrlDecode();
+                return await _userManager.VerifyUserTokenAsync(user, _userManager.Options.Tokens.PasswordResetTokenProvider, "ResetPassword", resetToken);
+            }
+            return false;
         }
     }
 }
