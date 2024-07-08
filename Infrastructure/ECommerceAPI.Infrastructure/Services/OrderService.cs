@@ -2,6 +2,7 @@
 using ECommerceAPI.Application.DTOs;
 using ECommerceAPI.Application.DTOs.Order;
 using ECommerceAPI.Application.Repositories;
+using ECommerceAPI.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceAPI.Infrastructure.Services
@@ -10,11 +11,13 @@ namespace ECommerceAPI.Infrastructure.Services
     {
         private readonly IOrderWriteRepository _orderWriteRepository;
         private readonly IOrderReadRepository _orderReadRepository;
+        private readonly ICompletedOrderWriteRepository _completedOrderWriteRepository;
 
-        public OrderService(IOrderWriteRepository orderWriteRepository, IOrderReadRepository orderReadRepository)
+        public OrderService(IOrderWriteRepository orderWriteRepository, IOrderReadRepository orderReadRepository, ICompletedOrderWriteRepository completedOrderWriteRepository)
         {
             _orderWriteRepository = orderWriteRepository;
             _orderReadRepository = orderReadRepository;
+            _completedOrderWriteRepository = completedOrderWriteRepository;
         }
 
         public async Task CreateOrderAsync(CreateOrder createOrder)
@@ -82,6 +85,17 @@ namespace ECommerceAPI.Infrastructure.Services
                     bi.Quantity
                 })
             };
+        }
+
+        public async Task CompleteOrder(Guid orderId)
+        {
+            Order order = await _orderReadRepository.GetByIdAsync(orderId);
+
+            if (order != null)
+            {
+                await _completedOrderWriteRepository.AddAsync(new() { OrderId = orderId });
+                await _completedOrderWriteRepository.SaveAsync();
+            }
         }
     }
 }

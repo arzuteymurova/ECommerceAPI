@@ -22,6 +22,7 @@ namespace ECommerceAPI.Persistence.Contexts
         public DbSet<InvoiceFile> InvoiceFiles { get; set; }
         public DbSet<Basket> Baskets { get; set; }
         public DbSet<BasketItem> BasketItems { get; set; }
+        public DbSet<CompletedOrder> CompletedOrders { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -30,6 +31,11 @@ namespace ECommerceAPI.Persistence.Contexts
 
             builder.Entity<Order>()
                 .HasIndex(o => o.OrderCode);
+
+            builder.Entity<Order>()
+                .HasOne(o=>o.CompletedOrder)
+                .WithOne(c=>c.Order)
+                .HasForeignKey<CompletedOrder>(c => c.OrderId);
 
             builder.Entity<Basket>()
                 .HasOne(b => b.Order)
