@@ -44,7 +44,8 @@ namespace ECommerceAPI.Infrastructure.Services
                     .ThenInclude(b => b.User)
                 .Include(o => o.Basket)
                     .ThenInclude(b => b.BasketItems)
-                    .ThenInclude(bi => bi.Product);
+                    .ThenInclude(bi => bi.Product)
+                .Include(o => o.CompletedOrder);
 
             var data = query.Skip(page * size).Take(size);
 
@@ -57,7 +58,8 @@ namespace ECommerceAPI.Infrastructure.Services
                     CreatedDate = o.CreatedDate,
                     OrderCode = o.OrderCode,
                     TotalPrice = o.Basket.BasketItems.Sum(bi => bi.Product.Price * bi.Quantity),
-                    UserName = o.Basket.User.UserName
+                    UserName = o.Basket.User.UserName,
+                    Completed = o.CompletedOrder != null ? true : false,
                 }).ToListAsync()
             };
         }
@@ -67,11 +69,12 @@ namespace ECommerceAPI.Infrastructure.Services
             var query = _orderReadRepository.Table
               .Include(o => o.Basket)
                   .ThenInclude(b => b.BasketItems)
-                  .ThenInclude(bi => bi.Product);
+                  .ThenInclude(bi => bi.Product)
+             .Include(o => o.CompletedOrder);
 
             var data = await query.FirstOrDefaultAsync(o => o.Id == id);
 
-            return new SingleOrder()
+            return new()
             {
                 Id = data.Id,
                 OrderCode = data.OrderCode,
@@ -83,19 +86,31 @@ namespace ECommerceAPI.Infrastructure.Services
                     bi.Product.Name,
                     bi.Product.Price,
                     bi.Quantity
-                })
+                }),
+                Completed = data.CompletedOrder != null,
             };
         }
 
-        public async Task CompleteOrder(Guid orderId)
+        public async Task<(bool, CompletedOrderDto)> CompleteOrderAsync(Guid orderId)
         {
-            Order order = await _orderReadRepository.GetByIdAsync(orderId);
+            Order? order = await _orderReadRepository.Table
+                .Include(o => o.Basket)
+                .ThenInclude(b => b.User)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
 
             if (order != null)
             {
                 await _completedOrderWriteRepository.AddAsync(new() { OrderId = orderId });
-                await _completedOrderWriteRepository.SaveAsync();
+                return (await _completedOrderWriteRepository.SaveAsync() > 0, new()
+                {
+                    OrderCode = order.OrderCode,
+                    OrderDate = order.CreatedDate,
+                    Name = order.Basket.User.FirstName,
+                    Surname = order.Basket.User.LastName,
+                    Email = order.Basket.User.Email
+                });
             }
+            return (false, null);
         }
     }
 }

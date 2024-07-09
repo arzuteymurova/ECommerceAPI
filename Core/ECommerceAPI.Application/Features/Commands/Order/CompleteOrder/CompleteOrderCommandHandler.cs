@@ -1,20 +1,25 @@
 ﻿using ECommerceAPI.Application.Abstractions.Services;
+using ECommerceAPI.Application.DTOs.Order;
 using MediatR;
 
 namespace ECommerceAPI.Application.Features.Commands.Order.CompleteOrder
 {
     public class CompleteOrderCommandHandler : IRequestHandler<CompleteOrderCommandRequest, CompleteOrderCommandResponse>
     {
-        private readonly IOrderService _orderService;
+        readonly IOrderService _orderService;
+        readonly IMailService _mailService;
 
-        public CompleteOrderCommandHandler(IOrderService orderService)
+        public CompleteOrderCommandHandler(IOrderService orderService, IMailService mailService)
         {
             _orderService = orderService;
+            _mailService = mailService;
         }
 
         public async Task<CompleteOrderCommandResponse> Handle(CompleteOrderCommandRequest request, CancellationToken cancellationToken)
         {
-            await _orderService.CompleteOrder(request.OrderId);
+            (bool succeeded, CompletedOrderDto dto) = await _orderService.CompleteOrderAsync(request.OrderId);
+            if (succeeded)
+                await _mailService.SendCompletedOrderMailAsync(dto.Email, dto.OrderCode, dto.OrderDate, dto.Name, dto.Surname);
             return new();
         }
     }

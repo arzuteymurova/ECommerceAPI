@@ -55,5 +55,12 @@ namespace ECommerceAPI.Infrastructure.Services
 
             await SendMailAsync(to, "Şifre Yenileme Talebi", mail.ToString());
         }
+
+        public async Task SendCompletedOrderMailAsync(string to, string orderCode, DateTime orderDate, string name, string surname)
+        {
+            string mail = $"Dear {name} {surname}<br>Your order with code {orderCode}, which you placed on {orderDate}, has been completed and given to the cargo company.<br>Good luck!";
+
+            await SendMailAsync(to, "Order completed", mail);
+        }
     }
 }
