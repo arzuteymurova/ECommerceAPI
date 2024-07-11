@@ -11,13 +11,13 @@ namespace ECommerceAPI.Infrastructure.Configurations
 {
     public class ApplicationServices : IApplicationService
     {
-        public List<Menu> GetAuthorizeDefinitionEndpoints(Type type)
+        public List<Application.DTOs.Configuration.Controller> GetAuthorizeDefinitionEndpoints(Type type)
         {
             var assembly = Assembly.GetAssembly(type);
             var controllers = assembly.GetTypes()
                                       .Where(t => typeof(ControllerBase).IsAssignableFrom(t));
 
-            var menus = new List<Menu>();
+            var menus = new List<Application.DTOs.Configuration.Controller>();
 
             foreach (var controller in controllers)
             {
@@ -32,7 +32,7 @@ namespace ECommerceAPI.Infrastructure.Configurations
                     if (authorizeDefinition == null) continue;
 
                     var menu = menus.FirstOrDefault(m => m.Name == authorizeDefinition.Menu) ??
-                               new Menu { Name = authorizeDefinition.Menu, Actions = new List<Application.DTOs.Configuration.Action>() };
+                               new Application.DTOs.Configuration.Controller { Name = authorizeDefinition.Menu, Actions = new List<Application.DTOs.Configuration.Action>() };
 
                     if (!menus.Any(m => m.Name == authorizeDefinition.Menu))
                     {

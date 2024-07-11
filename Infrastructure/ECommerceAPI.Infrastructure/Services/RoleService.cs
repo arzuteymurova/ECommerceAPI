@@ -31,11 +31,17 @@ namespace ECommerceAPI.Infrastructure.Services
         public async Task<ListRole> GetAllRolesAsync(int page, int size)
         {
             var query = _roleManager.Roles;
-            var roles = query.Skip(page * size).Take(size);
+
+            IQueryable<AppRole>? rolesQuery = null;
+
+            if (page != -1 && size != -1)
+                rolesQuery = query.Skip(page * size).Take(size);
+            else
+                rolesQuery = query;
 
             return new()
             {
-                Roles = await roles.ToListAsync(),
+                Roles = await rolesQuery.ToListAsync(),
                 TotalRoleCount = await query.CountAsync(),
             };
         }
