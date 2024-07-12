@@ -2,7 +2,7 @@
 
 namespace ECommerceAPI.Application.Repositories
 {
-    public interface IMenuReadRepository : IReadRepository<Menu>
+    public interface IEndpointReadRepository : IReadRepository<Endpoint>
     {
     }
 }

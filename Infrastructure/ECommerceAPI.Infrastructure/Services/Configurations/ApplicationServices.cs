@@ -1,23 +1,23 @@
 ﻿using ECommerceAPI.Application.Abstractions.Services.Configurations;
 using ECommerceAPI.Application.CustomAttributes;
-using ECommerceAPI.Application.DTOs.Configuration;
 using ECommerceAPI.Application.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using System.Reflection;
+using EndpointController = ECommerceAPI.Application.DTOs.Configuration.EndpointController;
 
-namespace ECommerceAPI.Infrastructure.Configurations
+namespace ECommerceAPI.Infrastructure.Services.Configurations
 {
     public class ApplicationServices : IApplicationService
     {
-        public List<Application.DTOs.Configuration.Controller> GetAuthorizeDefinitionEndpoints(Type type)
+        public List<EndpointController> GetAuthorizeDefinitionEndpoints(Type type)
         {
             var assembly = Assembly.GetAssembly(type);
             var controllers = assembly.GetTypes()
                                       .Where(t => typeof(ControllerBase).IsAssignableFrom(t));
 
-            var menus = new List<Application.DTOs.Configuration.Controller>();
+            List<EndpointController> endpointControllers = new();
 
             foreach (var controller in controllers)
             {
@@ -31,12 +31,12 @@ namespace ECommerceAPI.Infrastructure.Configurations
                     var authorizeDefinition = attributes.OfType<AuthorizeDefinitionAttribute>().FirstOrDefault();
                     if (authorizeDefinition == null) continue;
 
-                    var menu = menus.FirstOrDefault(m => m.Name == authorizeDefinition.Menu) ??
-                               new Application.DTOs.Configuration.Controller { Name = authorizeDefinition.Menu, Actions = new List<Application.DTOs.Configuration.Action>() };
+                    var endpointController = endpointControllers.FirstOrDefault(m => m.Name == authorizeDefinition.Controller) ??
+                               new EndpointController { Name = authorizeDefinition.Controller, Actions = new List<Application.DTOs.Configuration.Action>() };
 
-                    if (!menus.Any(m => m.Name == authorizeDefinition.Menu))
+                    if (!endpointControllers.Any(m => m.Name == authorizeDefinition.Controller))
                     {
-                        menus.Add(menu);
+                        endpointControllers.Add(endpointController);
                     }
 
                     var actionType = Enum.GetName(typeof(ActionType), authorizeDefinition.ActionType);
@@ -50,10 +50,10 @@ namespace ECommerceAPI.Infrastructure.Configurations
                         Code = $"{httpAttribute?.HttpMethods.FirstOrDefault() ?? HttpMethods.Get}.{actionType}.{authorizeDefinition.Definition.Replace(" ", "")}"
                     };
 
-                    menu.Actions.Add(actionDto);
+                    endpointController.Actions.Add(actionDto);
                 }
             }
-            return menus;
+            return endpointControllers;
         }
     }
 }

@@ -1,7 +1,10 @@
-﻿namespace ECommerceAPI.Application.Abstractions.Services
+﻿using ECommerceAPI.Domain.Entities;
+
+namespace ECommerceAPI.Application.Abstractions.Services
 {
     public interface IAuthorizationEndpointService
     {
-        public Task AssignRoleToEndpointAsync(string[] roles, string code);
+        Task AssignRoleToEndpointAsync(string[] roles, string controller, string code, Type type);
+        Task<List<string>> GetRolesToEndpointAsync(string code, string controller);
     }
 }

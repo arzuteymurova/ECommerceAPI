@@ -3,9 +3,9 @@ using ECommerceAPI.Application.Abstractions.Services;
 using ECommerceAPI.Application.Abstractions.Services.Authentications;
 using ECommerceAPI.Application.Abstractions.Services.Configurations;
 using ECommerceAPI.Application.Abstractions.Storage;
-using ECommerceAPI.Infrastructure.Configurations;
 using ECommerceAPI.Infrastructure.Enums;
 using ECommerceAPI.Infrastructure.Services;
+using ECommerceAPI.Infrastructure.Services.Configurations;
 using ECommerceAPI.Infrastructure.Services.Identity;
 using ECommerceAPI.Infrastructure.Services.Storage;
 using ECommerceAPI.Infrastructure.Services.Storage.Local;
@@ -21,6 +21,7 @@ namespace ECommerceAPI.Infrastructure
             services.AddScoped<IJWTTokenService,JWTTokenService>();
             services.AddScoped<IMailService,MailService>();
             services.AddScoped<IApplicationService,ApplicationServices>();
+            services.AddScoped<IAuthorizationEndpointService,AuthorizationEndpointService>();
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
