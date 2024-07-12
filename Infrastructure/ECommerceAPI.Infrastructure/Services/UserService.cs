@@ -4,6 +4,7 @@ using ECommerceAPI.Application.Exceptions;
 using ECommerceAPI.Application.Helpers;
 using ECommerceAPI.Domain.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceAPI.Infrastructure.Services
 {
@@ -58,11 +59,50 @@ namespace ECommerceAPI.Infrastructure.Services
 
                 IdentityResult result = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
 
-                if(result.Succeeded)
+                if (result.Succeeded)
                     await _userManager.UpdateSecurityStampAsync(user);
                 else
                     throw new PasswordChangeFailedException();
             }
+        }
+
+        public async Task<ListUser> GetAllUsers(int page, int size)
+        {
+            var users = await _userManager.Users
+                .Skip(page * size)
+                .Take(size)
+                .ToListAsync();
+
+            return new ListUser()
+            {
+                TotalUserCount = users.Count,
+                Users = users
+            };
+        }
+
+        public async Task AssignRoleToUserAsync(Guid userId, string[] roles)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+
+            if (user != null)
+            {
+                var userRoles = await _userManager.GetRolesAsync(user);
+                await _userManager.RemoveFromRolesAsync(user, userRoles);
+                await _userManager.AddToRolesAsync(user, roles);
+            }
+        }
+
+        public async Task<string[]> GetRolesToUserAsync(Guid userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+
+            if (user != null) {
+
+                var userRoles = await _userManager.GetRolesAsync(user);
+                return userRoles.ToArray();
+            }
+
+            return [];
         }
     }
 }
