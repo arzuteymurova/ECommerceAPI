@@ -21,7 +21,6 @@ namespace ECommerceAPI.API.Controllers
             _mediator = mediator;
         }
 
-        [AllowAnonymous]
         [HttpPost("[action]")]
         public async Task<IActionResult> Login(LoginUserCommandRequest loginUserCommandRequest)
         {

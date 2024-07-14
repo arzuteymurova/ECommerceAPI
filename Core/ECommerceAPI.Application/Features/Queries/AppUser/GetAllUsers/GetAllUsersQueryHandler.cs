@@ -14,7 +14,7 @@ namespace ECommerceAPI.Application.Features.Queries.AppUser.GetAllUsers
 
         public async Task<GetAllUsersQueryResponse> Handle(GetAllUsersQueryRequest request, CancellationToken cancellationToken)
         {
-            var data = await _userService.GetAllUsers(request.Page, request.Size);
+            var data = await _userService.GetAllUsersAsync(request.Page, request.Size);
 
             return new()
             {

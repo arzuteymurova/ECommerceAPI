@@ -13,10 +13,15 @@ using Serilog.Core;
 using Serilog.Sinks.MSSqlServer;
 using System.Collections.ObjectModel;
 using System.Data;
+using ECommerceAPI.API.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers(options => options.Filters.Add<ValidationFilter>())
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ValidationFilter>();
+    options.Filters.Add<RolePermissionFilter>();
+})
     .AddFluentValidation(configuration => configuration.RegisterValidatorsFromAssemblyContaining<CreateProductValidator>())
     .ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true);
 
@@ -56,13 +61,13 @@ columnOpts.AdditionalColumns = new Collection<SqlColumn>
 };
 
 Logger logger = new LoggerConfiguration()
-    .MinimumLevel.Debug() 
+    .MinimumLevel.Debug()
     .WriteTo.MSSqlServer(
         connectionString: @"Server=(localdb)\MSSQLLocalDB;Database=ECommerceDb;Trusted_Connection=True;",
         sinkOptions: new MSSqlServerSinkOptions
         {
             TableName = "Logs",
-            AutoCreateSqlTable = true 
+            AutoCreateSqlTable = true
         },
         columnOptions: columnOpts
     )
